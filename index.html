@@ -38,14 +38,13 @@
     <!-- main body -->
     <div class="weather-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
         <h1 class="display-4">Weather by Zipcode</h1>
-        <p class="lead">Enter your desired zipcode in the area below to get the weather info! </p>
+        <p class="lead">Enter your zipcode to get the weather info! </p>
 
         <!-- zip entry form -->
         <form class="form-submit">
-            <img class="mb-4" src="./images/weatherPic.jpeg" alt="weatherPic.jpeg" width="85" height="85">
+            <img class="mb-4" src="./images/weatherPic.jpeg" alt="weatherPic.jpeg" width="100" height="100">
             <input class="form-control" type="text" placeholder="Enter zipcode" aria-label="zipcode input">
             <button class="btn btn-lg btn-primary btn-block" type="button">submit</button>
-            <!-- <button class="btn" type="submit">submit</button> -->
         </form>
     </div>
 
@@ -53,102 +52,64 @@
         <div class="card-deck mb-3 text-center">
             <div class="card mb-4 box-shadow">
                 <div class="card-header">
-                    <h4 class="my-0 font-weight-normal">City Name</h4>
+                    <h4 class="my-0 font-weight-normal" id="cityName"></h4>
                 </div>
                 <div class="card-body">
-                    <h1 class="card-title">weather info comes here <small class="text-muted">/ might be needed</small>
-                    </h1>
-                    <ul class="list-unstyled mt-3 mb-4">
-                        <li>10 users included</li>
-                        <li>2 GB of storage</li>
-                        <li>Email support</li>
-                        <li>Help center access</li>
-                    </ul>
+                    <h1 class="card-title" id="weatherInfo"> </h1>
+                    <h3><small class="text-muted" id="weatherDesc"> </small></h3>
+                    <img id="weatherIcon" src="" alt="">
+
                 </div>
             </div>
         </div>
-
-        <!-- <footer class="pt-4 my-md-5 pt-md-5 border-top">
-            <div class="row">
-                <div class="col-12 col-md">
-                    <img class="mb-2" src="https://getbootstrap.com/docs/4.0/assets/brand/bootstrap-solid.svg" alt=""
-                        width="24" height="24">
-                    <small class="d-block mb-3 text-muted">&copy; 2017-2018</small>
-                </div>
-                <div class="col-6 col-md">
-                    <h5>Features</h5>
-                    <ul class="list-unstyled text-small">
-                        <li><a class="text-muted" href="#">Cool stuff</a></li>
-                        <li><a class="text-muted" href="#">Random feature</a></li>
-                        <li><a class="text-muted" href="#">Team feature</a></li>
-                        <li><a class="text-muted" href="#">Stuff for developers</a></li>
-                        <li><a class="text-muted" href="#">Another one</a></li>
-                        <li><a class="text-muted" href="#">Last time</a></li>
-                    </ul>
-                </div>
-                <div class="col-6 col-md">
-                    <h5>Resources</h5>
-                    <ul class="list-unstyled text-small">
-                        <li><a class="text-muted" href="#">Resource</a></li>
-                        <li><a class="text-muted" href="#">Resource name</a></li>
-                        <li><a class="text-muted" href="#">Another resource</a></li>
-                        <li><a class="text-muted" href="#">Final resource</a></li>
-                    </ul>
-                </div>
-                <div class="col-6 col-md">
-                    <h5>About</h5>
-                    <ul class="list-unstyled text-small">
-                        <li><a class="text-muted" href="#">Team</a></li>
-                        <li><a class="text-muted" href="#">Locations</a></li>
-                        <li><a class="text-muted" href="#">Privacy</a></li>
-                        <li><a class="text-muted" href="#">Terms</a></li>
-                    </ul>
-                </div>
-            </div>
-        </footer> -->
     </div>
 
     <footer>
         <p class="mt-5 mb-3 text-muted">© 2017-2018</p>
     </footer>
 
-
-
     <!-- JavaScript
     ================================================== -->
     <script>
-        console.log("That's ready!")
+        var zipcode = '';
+        var APIKey = 'c424bf3c2e496d3667222e4419af93a3';
+        var url = 'http://api.openweathermap.org/data/2.5/weather?zip=';
+        var icon_url = 'http://openweathermap.org/img/wn/';
 
-        $(document).ready(function () {
+        $('.container').hide();
 
-            var clientKey = "js-zdU7nEevxhrAPGyykbyswsHkvS5Tp0uGxyWwmk90TDLFY3ZZbxumu8A2QXohM9wM";
-            var url = "http://www.zipcodeapi.com/rest/" + clientKey + "/info.json/";
+        /* VALIDATION ON INPUT TEXTBOX */
+        $('form input').keyup(function () {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
 
-            $('form button').click(function () {
-                var zipcode = $('form input').val().substring(0, 5);
-                console.log('clicked')
-                console.log(zipcode);
+        $('form button').click(function () {
 
-                /* MAKE AJAX REQUEST */
-                $.ajax({
-                    "url": url + zipcode + "/degrees",
-                    "dataType": "json",
-                }).done(function (data) {
-                    console.log(data.city)
-                    console.log(data.state)
-                })
-            })
+            /* FORM THE URL */
+            if ($('form input').val().substring(0, 5) == "") {
+                alert("Enter 5-Digit zipcode!");
+            }
+            else {
+                zipcode = $('form input').val().substring(0, 5);
+                url = url + zipcode + '&appid=' + APIKey;
+                console.log(url);
+
+                /* MAKE AN AJAX REQUEST */
+                $.get(url, function (data) {
+                    console.log(data);
+
+                    /* UPDATE Card with weather info */
+                    $('#cityName').text(data.name);
+                    $('#weatherInfo').text(data.weather[0].main);
+                    $('#weatherDesc').text(data.weather[0].description);
+                    $('#weatherIcon').attr('src', icon_url + data.weather[0].icon + '@2x.png');
+                    $('#weatherIcon').attr('alt', data.weather[0].icon + '@2x.png');
+                    $('.container').show();
+
+                }, 'json');
+            }
         })
-
-
     </script>
-
-    <!-- https://public.opendatasoft.com/explore/dataset/us-zip-code-latitude-and-longitude/api/?q='95678' 
-    returns:
-    "city": "CityName"
-    "geopoint":[lat, lon]
--->
-
 </body>
 
 </html>
