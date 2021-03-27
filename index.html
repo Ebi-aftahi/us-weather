@@ -56,8 +56,13 @@
                 </div>
                 <div class="card-body">
                     <h1 class="card-title" id="weatherInfo"> </h1>
-                    <h3><small class="text-muted" id="weatherDesc"> </small></h3>
                     <img id="weatherIcon" src="" alt="">
+                    <h3><small class="text-muted" id="weatherDesc"></small></h3>
+                    <h3><small class="text-muted" id="humidity"></small> <small><span class="text-muted">&#37</span></small></h3>
+                    <h3><small class="text-muted" id="temp"></small> <small><span class="text-muted"> &#176;F</span></small></h3>
+                    <h3><small class="text-danger" id="temp-max"></small><small><span class="text-muted"> &#176;F</span></small></h3>
+                    <h3><small class="text-primary" id="temp-min"></small><small><span class="text-muted"> &#176;F</span></small></h3>
+                    
 
                 </div>
             </div>
@@ -65,7 +70,7 @@
     </div>
 
     <footer>
-        <p class="mt-5 mb-3 text-muted">© 2017-2018</p>
+        <p class="mt-5 mb-3 text-muted">© Ebi Aftahi 2021-2022</p>
     </footer>
 
     <!-- JavaScript
@@ -91,18 +96,20 @@
             }
             else {
                 zipcode = $('form input').val().substring(0, 5);
-                url = url + zipcode + '&appid=' + APIKey;
+                url = url + zipcode + '&appid=' + APIKey + '&units=imperial';
                 
                 /* MAKE AN AJAX REQUEST */
                 $.get(url, function (data) {
-                    console.log(data);
-
                     /* UPDATE Card with weather info */
                     $('#cityName').text(data.name);
                     $('#weatherInfo').text(data.weather[0].main);
                     $('#weatherDesc').text(data.weather[0].description);
                     $('#weatherIcon').attr('src', icon_url + data.weather[0].icon + '@2x.png');
                     $('#weatherIcon').attr('alt', data.weather[0].icon + '@2x.png');
+                    $('#humidity').text("Humidity: " + data.main.humidity);
+                    $('#temp').text("Temperature: " + data.main.temp);
+                    $('#temp-max').text("Max: " + data.main.temp_max);
+                    $('#temp-min').text("Min: " + data.main.temp_min);
                     $('.container').show();
 
                 }, 'json');
